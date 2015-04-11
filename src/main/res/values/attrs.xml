@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PhoneNumberAutoComplete">
+        <attr name="color_phone_numbers" format="color" />
+        <attr name="color_names" format="color" />
+        <!--Caution: this property is overwritten by a bold text-->
+        <attr name="typed_letters_should_be_bold" format="boolean" />
+        <attr name="return_pattern" format="string"/>
+    </declare-styleable>
+</resources>
