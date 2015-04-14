@@ -7,5 +7,10 @@
         <attr name="typed_letters_should_be_bold" format="boolean" />
         <attr name="return_pattern" format="string"/>
         <attr name="display_photo" format="boolean"/>
+        <attr name="type_data" format="enum">
+            <enum name="phone" value="1"/>
+            <enum name="email" value="2"/>
+            <enum name="postal_address" value="3"/>
+        </attr>
     </declare-styleable>
 </resources>

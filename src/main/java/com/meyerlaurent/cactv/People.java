@@ -3,16 +3,17 @@ package com.meyerlaurent.cactv;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 
 /**
  * Created by laurentmeyer on 11/04/15.
  */
 public class People {
-    private SpannableStringBuilder name;
-    private SpannableStringBuilder data;
+    private Spanned name;
+    private Spanned data;
     private Bitmap picture;
 
-    public People(SpannableStringBuilder name, SpannableStringBuilder data, Bitmap picture) {
+    public People(Spanned name, SpannableStringBuilder data, Bitmap picture) {
         this.name = name;
         this.data = data;
         this.picture = picture;
@@ -27,15 +28,15 @@ public class People {
     }
 
 
-    public SpannableStringBuilder getName() {
+    public Spanned getName() {
         return name;
     }
 
-    public void setName(SpannableStringBuilder name) {
+    public void setName(Spanned name) {
         this.name = name;
     }
 
-    public SpannableStringBuilder getData() {
+    public Spanned getData() {
         return data;
     }
 

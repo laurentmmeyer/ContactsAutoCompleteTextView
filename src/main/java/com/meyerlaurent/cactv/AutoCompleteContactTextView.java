@@ -3,8 +3,8 @@ package com.meyerlaurent.cactv;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.text.Editable;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
+import android.text.Html;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -34,17 +34,21 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
 
     boolean displayPhoto;
 
+    enum TYPE_OF_DATA {PHONE, EMAIL, PHYSICAL_ADDRESS}
+
+    private TYPE_OF_DATA type = TYPE_OF_DATA.PHONE;
+
     public AutoCompleteContactTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
 
-    public AutoCompleteContactTextView(Context context, AttributeSet attrs, int defStyle){
+    public AutoCompleteContactTextView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context, attrs);
     }
 
-    public void setCustomAdapter(CustomAdapter adapter){
+    public void setCustomAdapter(CustomAdapter adapter) {
         this.adapter = adapter;
         hasCustomAdapter = true;
         setAdapter(adapter);
@@ -77,12 +81,12 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
                 selected = (People) getAdapter().getItem(position);
             }
         });
-        if (attrs != null){
+        if (attrs != null) {
             TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.PhoneNumberAutoComplete);
             colorPhone = array.getColor(R.styleable.PhoneNumberAutoComplete_color_phone_numbers, getResources().getColor(android.R.color.holo_blue_dark));
             colorName = array.getColor(R.styleable.PhoneNumberAutoComplete_color_names, getResources().getColor(android.R.color.black));
             shouldBeBold = array.getBoolean(R.styleable.PhoneNumberAutoComplete_typed_letters_should_be_bold, false);
-            returnPattern = TextUtils.isEmpty(array.getString(R.styleable.PhoneNumberAutoComplete_return_pattern))?"[Nn]: [P]":array.getString(R.styleable.PhoneNumberAutoComplete_return_pattern);
+            returnPattern = TextUtils.isEmpty(array.getString(R.styleable.PhoneNumberAutoComplete_return_pattern)) ? "[Nn]: [P]" : array.getString(R.styleable.PhoneNumberAutoComplete_return_pattern);
             displayPhoto = array.getBoolean(R.styleable.PhoneNumberAutoComplete_display_photo, false);
         }
 
@@ -96,26 +100,26 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
 
     @Override
     public Editable getText() {
-        if (isSomeoneSelected()){
+        if (isSomeoneSelected()) {
             String temp = returnPattern;
             String name = selected.getName().toString();
             String data = selected.getData().toString();
-            if (temp.contains("[Nn]")){
+            if (temp.contains("[Nn]")) {
                 boolean isAdapted = Character.isUpperCase(name.toCharArray()[0]);
-                if (!isAdapted){
+                if (!isAdapted) {
                     char[] array = name.toCharArray();
                     array[0] = Character.toUpperCase(array[0]);
                     name = String.valueOf(array);
                 }
                 temp.replace("[Nn]", name);
             }
-            if (temp.contains("[N]")){
+            if (temp.contains("[N]")) {
                 temp.replace("[N]", name.toUpperCase());
             }
-            if (temp.contains("[n]")){
+            if (temp.contains("[n]")) {
                 temp.replace("[n]", name.toLowerCase());
             }
-            if (temp.contains("[d]")){
+            if (temp.contains("[d]")) {
                 temp.replace("[d]", data);
             }
             return Editable.Factory.getInstance().newEditable(temp);
@@ -129,7 +133,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
         Filter filter;
 
         private ContactsAdapter(Context context) {
-            super(context);
+            super(context, type);
         }
 
         @Override
@@ -158,10 +162,10 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
             name.setTextColor(colorName);
             data.setText(((People) getItem(position)).getData());
             data.setTextColor(colorPhone);
-            if (displayPhoto){
+            if (displayPhoto) {
                 ImageView iv = (ImageView) v.findViewById(R.id.thumbnail_picture);
                 People p = (People) getItem(position);
-                if (p.getPicture()!=null){
+                if (p.getPicture() != null) {
                     iv.setImageBitmap(p.getPicture());
                     iv.setVisibility(View.VISIBLE);
                 }
@@ -182,16 +186,22 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
                     } else {
                         ArrayList<People> filtered = new ArrayList<>();
                         for (People toFilter : dataList) {
-                            if (toFilter.getName().toString().toLowerCase().contains(constraint.toString().toLowerCase()) || toFilter.getData().toString().contains(constraint)) {
-                                if (shouldBeBold){
-                                    // Get the index of the first concerned letter
-                                    int nameFirst = toFilter.getName().toString().toLowerCase().indexOf(constraint.toString().toLowerCase().charAt(0));
-                                    // The end
-                                    int nameEnd = nameFirst + constraint.length();
-                                    // Make it bold baby
-                                    final SpannableStringBuilder str = new SpannableStringBuilder(toFilter.getName());
-                                    str.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.BOLD), nameFirst, nameEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                                    toFilter.setName(str);
+                            if (toFilter.getName().toString().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                                if (shouldBeBold) {
+                                    String temp = toFilter.getName().toString().replace("<b>", "").replace("</b>", "");
+                                    ArrayList<Integer> positions = new ArrayList<>();
+                                    for (int i = -1; (i = temp.toLowerCase().indexOf(constraint.toString().toLowerCase(), i + 1)) != -1; ) {
+                                        positions.add(i);
+                                    }
+                                    StringBuilder builder = new StringBuilder(temp);
+                                    int offsetIntroduced = 0;
+                                    for (Integer position : positions){
+                                        builder.insert(position+(offsetIntroduced*7), "<b>");
+                                        builder.insert(position+((offsetIntroduced*7)+3)+ constraint.length(), "</b>");
+                                        offsetIntroduced++;
+                                    }
+                                    Spanned text = Html.fromHtml(builder.toString());
+                                    toFilter.setName(text);
                                 }
                                 filtered.add(toFilter);
                             }
@@ -213,7 +223,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
         }
     }
 
-    public boolean isSomeoneSelected(){
-        return selected!=null;
+    public boolean isSomeoneSelected() {
+        return selected != null;
     }
 }

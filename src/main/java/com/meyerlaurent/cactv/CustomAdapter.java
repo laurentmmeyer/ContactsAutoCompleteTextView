@@ -25,42 +25,58 @@ import java.util.ArrayList;
  */
 public abstract class CustomAdapter extends BaseAdapter implements Filterable {
 
-    private static final String[] PHOTO_ID_PROJECTION = new String[]{
-            ContactsContract.Contacts.PHOTO_ID
-    };
-
-    private static final String[] PHOTO_BITMAP_PROJECTION = new String[]{
-            ContactsContract.CommonDataKinds.Photo.PHOTO
-    };
-
     Context context;
-
-    //TODO: Get the picture
-
     ArrayList<People> dataList = new ArrayList<>();
 
-    CustomAdapter(Context context, String whatToGet) {
+    CustomAdapter(Context context, String whatToGet, Uri service) {
         this.context = context;
         // TODO: Make it changeable (need to look in the  API)
-        Cursor phones = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
-        if (phones != null)
+        Cursor cursor = context.getContentResolver().query(service, null, null, null, null);
+        if (cursor != null)
 
         {
-            while (phones.moveToNext()) {
-                String name = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                String data = phones.getString(phones.getColumnIndex(whatToGet));
-                String id = phones.getString(phones.getColumnIndex(ContactsContract.Contacts._ID));
+            while (cursor.moveToNext()) {
+                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                String data = cursor.getString(cursor.getColumnIndex(whatToGet));
+                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
                 dataList.add(new People(new SpannableStringBuilder(name), new SpannableStringBuilder(data), loadContactPhoto(context.getContentResolver(), Long.parseLong(id))));
             }
-            phones.close();
+            cursor.close();
         }
     }
 
-    CustomAdapter(Context context) {
-        this(context, ContactsContract.CommonDataKinds.Phone.NUMBER);
+    CustomAdapter(Context context, AutoCompleteContactTextView.TYPE_OF_DATA data) {
+        this(context, transformInt(data), transformDataUri(data));
 
     }
-    public static Bitmap loadContactPhoto(ContentResolver cr, long  id) {
+
+    private static String transformInt(AutoCompleteContactTextView.TYPE_OF_DATA data) {
+        switch (data) {
+            case PHONE:
+                return ContactsContract.CommonDataKinds.Phone.NUMBER;
+            case EMAIL:
+                // TODO: Implement that
+            case PHYSICAL_ADDRESS:
+                // TODO: Implement that
+            default:
+                return ContactsContract.CommonDataKinds.Phone.NUMBER;
+        }
+    }
+
+    private static Uri transformDataUri(AutoCompleteContactTextView.TYPE_OF_DATA data) {
+        switch (data) {
+            case PHONE:
+                return ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+            case PHYSICAL_ADDRESS:
+                // TODO: Implement that
+            case EMAIL:
+                // TODO: Implement that
+            default:
+                return ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        }
+    }
+
+    public static Bitmap loadContactPhoto(ContentResolver cr, long id) {
         Uri uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id);
         InputStream input = ContactsContract.Contacts.openContactPhotoInputStream(cr, uri);
         if (input == null) {
