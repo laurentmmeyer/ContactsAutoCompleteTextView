@@ -1,0 +1,1 @@
+ContactAutoCompleteTextView is a view which allows the user to search across all his contacts to get different kind of result like email, phone number or even postal address (who use postal address anymore :smile:)

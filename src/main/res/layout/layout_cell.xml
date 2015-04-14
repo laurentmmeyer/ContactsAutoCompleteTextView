@@ -4,18 +4,28 @@
     android:layout_height="wrap_content"
     android:padding="8dp">
 
-    <TextView
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/fragment_send_auto_text_name"
+        android:src="@android:drawable/ic_delete"
+        android:id="@+id/thumbnail_picture"
+        android:visibility="gone"
+        android:layout_marginRight="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/cell_name"
         android:text="Laurent Meyer"
         android:textColor="@android:color/holo_blue_dark"
+        android:gravity="center_vertical"
         android:textSize="16sp"/>
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:gravity="right|center"
-        android:text="+498981302021"
+        android:text="+491234567890"
         android:textSize="14sp"
-        android:id="@+id/fragment_send_auto_text_number"/>
+        android:layout_gravity="center_vertical"
+        android:id="@+id/cell_data"/>
 </LinearLayout>
