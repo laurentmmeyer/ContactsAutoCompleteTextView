@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Filter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -30,6 +31,8 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
     People selected = null;
     boolean hasCustomAdapter = false;
     CustomAdapter adapter;
+
+    boolean displayPhoto;
 
     public AutoCompleteContactTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -80,6 +83,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
             colorName = array.getColor(R.styleable.PhoneNumberAutoComplete_color_names, getResources().getColor(android.R.color.black));
             shouldBeBold = array.getBoolean(R.styleable.PhoneNumberAutoComplete_typed_letters_should_be_bold, false);
             returnPattern = TextUtils.isEmpty(array.getString(R.styleable.PhoneNumberAutoComplete_return_pattern))?"[Nn]: [P]":array.getString(R.styleable.PhoneNumberAutoComplete_return_pattern);
+            displayPhoto = array.getBoolean(R.styleable.PhoneNumberAutoComplete_display_photo, false);
         }
 
     }
@@ -95,7 +99,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
         if (isSomeoneSelected()){
             String temp = returnPattern;
             String name = selected.getName().toString();
-            String phone = selected.getNumber().toString();
+            String data = selected.getData().toString();
             if (temp.contains("[Nn]")){
                 boolean isAdapted = Character.isUpperCase(name.toCharArray()[0]);
                 if (!isAdapted){
@@ -111,8 +115,8 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
             if (temp.contains("[n]")){
                 temp.replace("[n]", name.toLowerCase());
             }
-            if (temp.contains("[p]")){
-                temp.replace("[p]", phone);
+            if (temp.contains("[d]")){
+                temp.replace("[d]", data);
             }
             return Editable.Factory.getInstance().newEditable(temp);
         }
@@ -121,7 +125,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
 
     private class ContactsAdapter extends CustomAdapter {
         ArrayList<People> toDisplayList = new ArrayList<>();
-        TextView number;
+        TextView data;
         Filter filter;
 
         private ContactsAdapter(Context context) {
@@ -147,29 +151,38 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View v = inflater.inflate(R.layout.fragment_send_auto_text, null);
-            TextView name = (TextView) v.findViewById(R.id.fragment_send_auto_text_name);
-            number = (TextView) v.findViewById(R.id.fragment_send_auto_text_number);
+            View v = inflater.inflate(R.layout.layout_cell, null);
+            TextView name = (TextView) v.findViewById(R.id.cell_name);
+            data = (TextView) v.findViewById(R.id.cell_data);
             name.setText(((People) getItem(position)).getName());
             name.setTextColor(colorName);
-            number.setText(((People) getItem(position)).getNumber());
-            number.setTextColor(colorPhone);
+            data.setText(((People) getItem(position)).getData());
+            data.setTextColor(colorPhone);
+            if (displayPhoto){
+                ImageView iv = (ImageView) v.findViewById(R.id.thumbnail_picture);
+                People p = (People) getItem(position);
+                if (p.getPicture()!=null){
+                    iv.setImageBitmap(p.getPicture());
+                    iv.setVisibility(View.VISIBLE);
+                }
+            }
             return v;
         }
 
         @Override
         public Filter getFilter() {
             filter = new Filter() {
+                // TODO check if the bold is deleted
                 @Override
                 protected FilterResults performFiltering(CharSequence constraint) {
                     FilterResults r = new FilterResults();
                     if (constraint == null || constraint.length() == 0) {
-                        r.values = phoneList;
-                        r.count = phoneList.size();
+                        r.values = dataList;
+                        r.count = dataList.size();
                     } else {
                         ArrayList<People> filtered = new ArrayList<>();
-                        for (People toFilter : phoneList) {
-                            if (toFilter.getName().toString().toLowerCase().contains(constraint.toString().toLowerCase()) || toFilter.getNumber().toString().contains(constraint)) {
+                        for (People toFilter : dataList) {
+                            if (toFilter.getName().toString().toLowerCase().contains(constraint.toString().toLowerCase()) || toFilter.getData().toString().contains(constraint)) {
                                 if (shouldBeBold){
                                     // Get the index of the first concerned letter
                                     int nameFirst = toFilter.getName().toString().toLowerCase().indexOf(constraint.toString().toLowerCase().charAt(0));

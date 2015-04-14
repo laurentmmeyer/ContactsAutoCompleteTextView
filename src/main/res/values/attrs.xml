@@ -6,5 +6,6 @@
         <!--Caution: this property is overwritten by a bold text-->
         <attr name="typed_letters_should_be_bold" format="boolean" />
         <attr name="return_pattern" format="string"/>
+        <attr name="display_photo" format="boolean"/>
     </declare-styleable>
 </resources>
