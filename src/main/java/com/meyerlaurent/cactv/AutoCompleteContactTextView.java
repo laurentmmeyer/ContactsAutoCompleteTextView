@@ -155,7 +155,12 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View v = inflater.inflate(R.layout.layout_cell, null);
+            View v;
+            if (convertView == null) {
+                v = inflater.inflate(R.layout.layout_cell, null);
+            } else {
+                v = convertView;
+            }
             TextView name = (TextView) v.findViewById(R.id.cell_name);
             data = (TextView) v.findViewById(R.id.cell_data);
             name.setText(((People) getItem(position)).getName());
@@ -176,7 +181,6 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
         @Override
         public Filter getFilter() {
             filter = new Filter() {
-                // TODO check if the bold is deleted
                 @Override
                 protected FilterResults performFiltering(CharSequence constraint) {
                     FilterResults r = new FilterResults();
@@ -188,21 +192,11 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
                         for (People toFilter : dataList) {
                             if (toFilter.getName().toString().toLowerCase().contains(constraint.toString().toLowerCase())) {
                                 if (shouldBeBold) {
-                                    String temp = toFilter.getName().toString().replace("<b>", "").replace("</b>", "");
-                                    ArrayList<Integer> positions = new ArrayList<>();
-                                    for (int i = -1; (i = temp.toLowerCase().indexOf(constraint.toString().toLowerCase(), i + 1)) != -1; ) {
-                                        positions.add(i);
-                                    }
-                                    StringBuilder builder = new StringBuilder(temp);
-                                    int offsetIntroduced = 0;
-                                    for (Integer position : positions){
-                                        builder.insert(position+(offsetIntroduced*7), "<b>");
-                                        builder.insert(position+((offsetIntroduced*7)+3)+ constraint.length(), "</b>");
-                                        offsetIntroduced++;
-                                    }
-                                    Spanned text = Html.fromHtml(builder.toString());
+                                    Spanned text = setBold(constraint, toFilter);
                                     toFilter.setName(text);
                                 }
+                                filtered.add(toFilter);
+                            } else if (toFilter.getData().toString().toLowerCase().startsWith(constraint.toString().toLowerCase())) {
                                 filtered.add(toFilter);
                             }
                         }
@@ -220,6 +214,22 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
                 }
             };
             return filter;
+        }
+
+        private Spanned setBold(CharSequence constraint, People toFilter) {
+            String temp = toFilter.getName().toString().replace("<b>", "").replace("</b>", "");
+            ArrayList<Integer> positions = new ArrayList<>();
+            for (int i = -1; (i = temp.toLowerCase().indexOf(constraint.toString().toLowerCase(), i + 1)) != -1; ) {
+                positions.add(i);
+            }
+            StringBuilder builder = new StringBuilder(temp);
+            int offsetIntroduced = 0;
+            for (Integer position : positions) {
+                builder.insert(position + (offsetIntroduced * 7), "<b>");
+                builder.insert(position + ((offsetIntroduced * 7) + 3) + constraint.length(), "</b>");
+                offsetIntroduced++;
+            }
+            return Html.fromHtml(builder.toString());
         }
     }
 
