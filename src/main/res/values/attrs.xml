@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="PhoneNumberAutoComplete">
-        <attr name="color_phone_numbers" format="color" />
-        <attr name="color_names" format="color" />
+        <attr name="colorOfData" format="color" />
+        <attr name="colorOfNames" format="color" />
         <!--Caution: this property is overwritten by a bold text-->
-        <attr name="typed_letters_should_be_bold" format="boolean" />
-        <attr name="return_pattern" format="string"/>
-        <attr name="display_photo" format="boolean"/>
-        <attr name="type_data" format="enum">
+        <attr name="typedLettersHaveDifferentStyle" format="boolean" />
+        <attr name="styleOfTypedLetters" format="enum">
+            <enum name="underlined" value="1"/>
+            <enum name="bold" value="2"/>
+        </attr>
+        <attr name="getTextPattern" format="string"/>
+        <attr name="displayPhotoIfAvailable" format="boolean"/>
+        <attr name="typeOfData" format="enum">
             <enum name="phone" value="1"/>
             <enum name="email" value="2"/>
             <enum name="postal_address" value="3"/>
