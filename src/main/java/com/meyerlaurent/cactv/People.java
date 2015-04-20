@@ -47,4 +47,24 @@ public class People {
     protected People(SpannableStringBuilder name, SpannableStringBuilder data) {
         this(name,data,null);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        People people = (People) o;
+
+        if (!data.equals(people.data)) return false;
+        if (!name.equals(people.name)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + data.hashCode();
+        return result;
+    }
 }

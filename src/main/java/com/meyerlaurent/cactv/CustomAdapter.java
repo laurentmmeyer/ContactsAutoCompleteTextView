@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.text.SpannableStringBuilder;
+import android.util.Log;
 import android.widget.BaseAdapter;
 import android.widget.Filterable;
 
@@ -30,6 +31,7 @@ public abstract class CustomAdapter extends BaseAdapter implements Filterable {
 
     CustomAdapter(Context context, String whatToGet, Uri service) {
         this.context = context;
+        Log.w("test", whatToGet+0+service.toString());
         // TODO: Make it changeable (need to look in the  API)
         Cursor cursor = context.getContentResolver().query(service, null, null, null, null);
         if (cursor != null)
@@ -39,7 +41,10 @@ public abstract class CustomAdapter extends BaseAdapter implements Filterable {
                 String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
                 String data = cursor.getString(cursor.getColumnIndex(whatToGet));
                 String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                dataList.add(new People(new SpannableStringBuilder(name), new SpannableStringBuilder(data), loadContactPhoto(context.getContentResolver(), Long.parseLong(id))));
+                People toBeAdded = new People(new SpannableStringBuilder(name), new SpannableStringBuilder(data), loadContactPhoto(context.getContentResolver(), Long.parseLong(id)));
+                if (!dataList.contains(toBeAdded)){
+                    dataList.add(toBeAdded);
+                }
             }
             cursor.close();
         }
@@ -55,7 +60,7 @@ public abstract class CustomAdapter extends BaseAdapter implements Filterable {
             case PHONE:
                 return ContactsContract.CommonDataKinds.Phone.NUMBER;
             case EMAIL:
-                // TODO: Implement that
+                return ContactsContract.CommonDataKinds.Email.DATA;
             case PHYSICAL_ADDRESS:
                 // TODO: Implement that
             default:
@@ -70,7 +75,7 @@ public abstract class CustomAdapter extends BaseAdapter implements Filterable {
             case PHYSICAL_ADDRESS:
                 // TODO: Implement that
             case EMAIL:
-                // TODO: Implement that
+                return ContactsContract.CommonDataKinds.Email.CONTENT_URI;
             default:
                 return ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
         }

@@ -33,6 +33,8 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
     CustomAdapter adapter;
     String typedLetterStyle;
 
+    int xmlIntType = 0;
+
     boolean displayPhoto;
 
     enum TYPE_OF_DATA {PHONE, EMAIL, PHYSICAL_ADDRESS}
@@ -57,8 +59,6 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
 
     private void init(Context context, AttributeSet attrs) {
         this.context = context;
-        adapter = new ContactsAdapter(context);
-        this.setAdapter(adapter);
         this.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -91,9 +91,20 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
             if (shouldBeDifferent){
                 typedLetterStyle = array.getInt(R.styleable.PhoneNumberAutoComplete_styleOfTypedLetters, 2)==1?"u":"b";
             }
+            xmlIntType = array.getInt(R.styleable.PhoneNumberAutoComplete_typeOfData, 1);
+            switch (xmlIntType){
+                case 1:
+                    type = TYPE_OF_DATA.PHONE;
+                case 2:
+                    type = TYPE_OF_DATA.EMAIL;
+                case 3:
+                    type = TYPE_OF_DATA.PHYSICAL_ADDRESS;
+            }
             returnPattern = TextUtils.isEmpty(array.getString(R.styleable.PhoneNumberAutoComplete_getTextPattern)) ? "[Nn]: [P]" : array.getString(R.styleable.PhoneNumberAutoComplete_getTextPattern);
             displayPhoto = array.getBoolean(R.styleable.PhoneNumberAutoComplete_displayPhotoIfAvailable, false);
         }
+        adapter = new ContactsAdapter(context, type);
+        this.setAdapter(adapter);
 
     }
 
@@ -138,6 +149,10 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
         Filter filter;
 
         private ContactsAdapter(Context context) {
+            super(context, type);
+        }
+
+        public ContactsAdapter(Context context, TYPE_OF_DATA type) {
             super(context, type);
         }
 
