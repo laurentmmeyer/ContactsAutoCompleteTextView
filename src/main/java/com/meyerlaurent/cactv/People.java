@@ -1,7 +1,6 @@
 package com.meyerlaurent.cactv;
 
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 
