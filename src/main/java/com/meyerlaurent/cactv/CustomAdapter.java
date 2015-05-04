@@ -7,6 +7,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.provider.ContactsContract;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
@@ -27,31 +30,24 @@ import java.util.ArrayList;
 public abstract class CustomAdapter extends BaseAdapter implements Filterable {
 
     Context context;
-    ArrayList<People> dataList = new ArrayList<>();
+    ArrayList<People> dataList;
 
-    CustomAdapter(Context context, String whatToGet, Uri service) {
+    CustomAdapter(Context context, String whatToGet, Uri service, final AsyncLoad load) {
         this.context = context;
-        Log.w("test", whatToGet+0+service.toString());
-        // TODO: Make it changeable (need to look in the  API)
-        Cursor cursor = context.getContentResolver().query(service, null, null, null, null);
-        if (cursor != null)
-
-        {
-            while (cursor.moveToNext()) {
-                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                String data = cursor.getString(cursor.getColumnIndex(whatToGet));
-                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                People toBeAdded = new People(new SpannableStringBuilder(name), new SpannableStringBuilder(data), loadContactPhoto(context.getContentResolver(), Long.parseLong(id)));
-                if (!dataList.contains(toBeAdded)){
-                    dataList.add(toBeAdded);
-                }
+        Handler mHandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                dataList = (ArrayList<People>) msg.obj;
+                load.hasLoaded(CustomAdapter.this);
             }
-            cursor.close();
-        }
+        };
+        SearchThread st = new SearchThread(whatToGet, service, mHandler);
+        st.start();
     }
 
-    CustomAdapter(Context context, AutoCompleteContactTextView.TYPE_OF_DATA data) {
-        this(context, transformInt(data), transformDataUri(data));
+    CustomAdapter(Context context, AutoCompleteContactTextView.TYPE_OF_DATA data, AsyncLoad load) {
+        this(context, transformInt(data), transformDataUri(data), load);
 
     }
 
@@ -88,5 +84,45 @@ public abstract class CustomAdapter extends BaseAdapter implements Filterable {
             return null;
         }
         return BitmapFactory.decodeStream(input);
+    }
+
+    public static interface AsyncLoad{
+        void hasLoaded(CustomAdapter adapter);
+    }
+
+    private class SearchThread extends Thread{
+        String whatToGet;
+        Uri service;
+        Handler mHandler;
+
+        ArrayList<People> list = new ArrayList<>();
+
+        private SearchThread(String whatToGet, Uri service, Handler handler) {
+            this.whatToGet = whatToGet;
+            this.service = service;
+            mHandler = handler;
+        }
+
+        @Override
+        public void run() {
+            Looper.prepare();
+            Cursor cursor = context.getContentResolver().query(service, null, null, null, null);
+            if (cursor != null)
+            {
+                while (cursor.moveToNext()) {
+                    String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                    String data = cursor.getString(cursor.getColumnIndex(whatToGet));
+                    String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                    People toBeAdded = new People(new SpannableStringBuilder(name), new SpannableStringBuilder(data), loadContactPhoto(context.getContentResolver(), Long.parseLong(id)));
+                    if (!list.contains(toBeAdded)){
+                        list.add(toBeAdded);
+                    }
+                }
+                cursor.close();
+                Message m = new Message();
+                m.obj = list;
+                mHandler.handleMessage(m);
+            }
+        }
     }
 }

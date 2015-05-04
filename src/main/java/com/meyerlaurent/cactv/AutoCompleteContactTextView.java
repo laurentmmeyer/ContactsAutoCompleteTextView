@@ -2,6 +2,7 @@ package com.meyerlaurent.cactv;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 /**
  * Created by laurentmeyer on 02/03/15.
  */
-public class AutoCompleteContactTextView extends AutoCompleteTextView {
+public class AutoCompleteContactTextView extends AutoCompleteTextView implements CustomAdapter.AsyncLoad{
     Context context;
     int colorData;
     int colorName;
@@ -37,9 +38,17 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
 
     boolean displayPhoto;
 
+
+    @Override
+    public void hasLoaded(CustomAdapter adapter) {
+        setAdapter(adapter);
+    }
+
     enum TYPE_OF_DATA {PHONE, EMAIL, PHYSICAL_ADDRESS}
 
     private TYPE_OF_DATA type = TYPE_OF_DATA.PHONE;
+
+    boolean isLoaded;
 
     public AutoCompleteContactTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -68,7 +77,9 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                ((ContactsAdapter) AutoCompleteContactTextView.this.getAdapter()).getFilter().filter(s);
+                if ( AutoCompleteContactTextView.this.getAdapter()!=null) {
+                    ((ContactsAdapter) AutoCompleteContactTextView.this.getAdapter()).getFilter().filter(s);
+                }
                 selected = null;
             }
 
@@ -96,10 +107,13 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
             switch (xmlIntType){
                 case 1:
                     type = TYPE_OF_DATA.PHONE;
+                    break;
                 case 2:
                     type = TYPE_OF_DATA.EMAIL;
+                    break;
                 case 3:
                     type = TYPE_OF_DATA.PHYSICAL_ADDRESS;
+                    break;
             }
             returnPattern = TextUtils.isEmpty(array.getString(R.styleable.PhoneNumberAutoComplete_getTextPattern)) ? "[Nn]: [P]" : array.getString(R.styleable.PhoneNumberAutoComplete_getTextPattern);
             displayPhoto = array.getBoolean(R.styleable.PhoneNumberAutoComplete_displayPhotoIfAvailable, false);
@@ -150,11 +164,11 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
         Filter filter;
 
         private ContactsAdapter(Context context) {
-            super(context, type);
+            super(context, type,AutoCompleteContactTextView.this);
         }
 
         public ContactsAdapter(Context context, TYPE_OF_DATA type) {
-            super(context, type);
+            super(context, type, AutoCompleteContactTextView.this);
         }
 
         @Override
@@ -207,7 +221,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView {
                     FilterResults r = new FilterResults();
                     if (constraint == null || constraint.length() == 0) {
                         r.values = dataList;
-                        r.count = dataList.size();
+                        r.count = (dataList==null?0:dataList.size());
                     } else {
                         ArrayList<People> filtered = new ArrayList<>();
                         for (People toFilter : dataList) {

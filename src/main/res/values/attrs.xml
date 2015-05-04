@@ -14,7 +14,6 @@
         <attr name="typeOfData" format="enum">
             <enum name="phone" value="1"/>
             <enum name="email" value="2"/>
-            <enum name="postal_address" value="3"/>
         </attr>
     </declare-styleable>
 </resources>
