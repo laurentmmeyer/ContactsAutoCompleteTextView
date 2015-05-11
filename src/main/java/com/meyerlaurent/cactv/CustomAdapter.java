@@ -13,6 +13,7 @@ import android.os.Message;
 import android.provider.ContactsContract;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
+import android.widget.Adapter;
 import android.widget.BaseAdapter;
 import android.widget.Filterable;
 
@@ -30,23 +31,37 @@ import java.util.ArrayList;
 public abstract class CustomAdapter extends BaseAdapter implements Filterable {
 
     Context context;
-    ArrayList<People> dataList;
+    /*
+    I'm not the biggest fan of initialize the variable directly but we need to have it to modify it in the handler
+     */
+    public ArrayList<People> dataList = new ArrayList<>();
 
-    CustomAdapter(Context context, String whatToGet, Uri service, final AsyncLoad load) {
+    CustomAdapter(Context context, String whatToGet, Uri service, AsyncLoad load) {
         this.context = context;
-        Handler mHandler = new Handler(){
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                dataList = (ArrayList<People>) msg.obj;
-                load.hasLoaded(CustomAdapter.this);
-            }
-        };
+        Handler mHandler = new CustomHandler(dataList, load, this);
         SearchThread st = new SearchThread(whatToGet, service, mHandler);
         st.start();
     }
 
-    CustomAdapter(Context context, AutoCompleteContactTextView.TYPE_OF_DATA data, AsyncLoad load) {
+    private static class CustomHandler extends Handler{
+        ArrayList<People> people;
+        AsyncLoad load;
+        CustomAdapter current;
+
+        private CustomHandler(ArrayList<People> people, AsyncLoad load, CustomAdapter current){
+            this.load = load;
+            this.people = people;
+            this.current = current;
+        }
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            people.addAll((ArrayList<People>) msg.obj);
+            load.hasLoaded(current);
+        }
+    }
+
+    public CustomAdapter(Context context, AutoCompleteContactTextView.TYPE_OF_DATA data, AsyncLoad load) {
         this(context, transformInt(data), transformDataUri(data), load);
 
     }
