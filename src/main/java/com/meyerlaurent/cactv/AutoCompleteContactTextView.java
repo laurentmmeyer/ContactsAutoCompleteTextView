@@ -44,7 +44,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
         setAdapter(adapter);
     }
 
-    enum TYPE_OF_DATA {PHONE, EMAIL, PHYSICAL_ADDRESS}
+    public enum TYPE_OF_DATA {PHONE, EMAIL, PHYSICAL_ADDRESS}
 
     private TYPE_OF_DATA type = TYPE_OF_DATA.PHONE;
 
@@ -78,7 +78,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if ( AutoCompleteContactTextView.this.getAdapter()!=null) {
-                    ((ContactsAdapter) AutoCompleteContactTextView.this.getAdapter()).getFilter().filter(s);
+                    ((CustomAdapter) AutoCompleteContactTextView.this.getAdapter()).getFilter().filter(s);
                 }
                 selected = null;
             }
@@ -121,7 +121,6 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
         }
         adapter = new ContactsAdapter(context, type);
         this.setAdapter(adapter);
-
     }
 
     public AutoCompleteContactTextView(Context context) {
