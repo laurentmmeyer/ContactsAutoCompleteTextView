@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+    <group android:id="@+id/exclusive_checkable_group"
+        android:checkableBehavior="single">
+        <!-- Notice how these items inherit from the group. -->
+        <item android:id="@+id/menu_phone"
+            android:title="Phone number"
+            android:checked="true"/>
+        <item android:id="@+id/menu_mail"
+            android:title="Email number" />
+        </group>
+        <item android:id="@+id/bold"
+            android:title="Bold effect"
+            android:checked="false" />
+</menu>
