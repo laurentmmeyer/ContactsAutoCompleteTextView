@@ -15,7 +15,6 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActionBar().setTitle("Demo");
         setContentView(R.layout.activity_main);
         textView = (AutoCompleteContactTextView) findViewById(R.id.coolStuff);
     }
