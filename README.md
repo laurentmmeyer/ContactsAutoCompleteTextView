@@ -7,7 +7,7 @@ The thread to get the data is asynchronous, which allow the view to load very fa
 ### Demo ###
 ![Alt text](http://img15.hostingpics.net/pics/884217ezgifcomgifmaker.gif)
 
-![Play store demo available](https://play.google.com/store/apps/details?id=dev.laurentmeyer.contactautocompleteview)
+[Play store demo available](https://play.google.com/store/apps/details?id=dev.laurentmeyer.contactautocompleteview)
 ### Roadmap ###
 
 1. Test the stability of the lib and improve the lifecycles of it (cache data)
