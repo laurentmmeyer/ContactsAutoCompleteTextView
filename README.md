@@ -1,3 +1,6 @@
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-ContactsAutoCompleteTextView-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1826)
+
+
 ## ContactAutoCompleteTextView ##
 
 ContactAutoCompleteTextView is a view which allows the user to search across all his contacts to get email or phone number.
