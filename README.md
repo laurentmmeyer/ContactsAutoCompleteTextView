@@ -25,10 +25,12 @@ The thread to get the data is asynchronous, which allow the view to load very fa
 ### How does it work? ###
 
 __Lib available for Gradle:__
+
 ```compile 'com.github.lolobosse.contactsautocompletetextview:library:0.1'```
 
 __And for Maven:__
-```bash
+
+```xml
 <dependency>
   <groupId>com.github.lolobosse.contactsautocompletetextview</groupId>
   <artifactId>library</artifactId>
