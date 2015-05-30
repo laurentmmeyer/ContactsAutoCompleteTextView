@@ -1,5 +1,5 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-ContactsAutoCompleteTextView-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1826)
-
+[![GitHub license](https://img.shields.io/github/license/mashape/apistatus.svg)]()
 
 ## ContactAutoCompleteTextView ##
 
