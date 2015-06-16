@@ -22,6 +22,10 @@ import java.util.ArrayList;
 /**
  * Created by laurentmeyer on 02/03/15.
  */
+
+/**
+ * Main class of the lib
+ */
 public class AutoCompleteContactTextView extends AutoCompleteTextView implements CustomAdapter.AsyncLoad {
     Context context;
     int colorData;
@@ -35,10 +39,17 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
     AttributeSet attrs;
     int xmlIntType = 0;
 
-    public enum TYPE_OF_DATA {PHONE, EMAIL, PHYSICAL_ADDRESS}
+    /**
+     * Choose which data you want to have
+     */
+    public enum TYPE_OF_DATA {PHONE, EMAIL}
 
     public enum STYLE {NONE, BOLD, UNDERLINE}
 
+    /**
+     * Call it if you want to create this view programmatically
+     * @param s: Style you want to set refer to {@link com.meyerlaurent.cactv.AutoCompleteContactTextView.STYLE}
+     */
     public void changeStyle(STYLE s) {
         switch (s) {
             case NONE:
@@ -55,7 +66,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
         }
     }
 
-
+    // Default is phone
     private TYPE_OF_DATA type = TYPE_OF_DATA.PHONE;
 
     boolean displayPhoto;
@@ -76,7 +87,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
         init(context, attrs, false);
     }
 
-    private void init(Context context, AttributeSet attrs, boolean programatic) {
+    private void init(Context context, AttributeSet attrs, boolean programmatic) {
         this.context = context;
         this.addTextChangedListener(new TextWatcher() {
             @Override
@@ -112,7 +123,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
             if (typedLettersShouldBeDifferent) {
                 typedLetterStyle = array.getInt(R.styleable.PhoneNumberAutoComplete_styleOfTypedLetters, 2) == 1 ? "u" : "b";
             }
-            if (!programatic) {
+            if (!programmatic) {
                 xmlIntType = array.getInt(R.styleable.PhoneNumberAutoComplete_typeOfData, 1);
                 switch (xmlIntType) {
                     case 1:
@@ -120,9 +131,6 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
                         break;
                     case 2:
                         type = TYPE_OF_DATA.EMAIL;
-                        break;
-                    case 3:
-                        type = TYPE_OF_DATA.PHYSICAL_ADDRESS;
                         break;
                 }
             }
@@ -134,6 +142,10 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
         this.setAdapter(adapter);
     }
 
+    /**
+     * Should give the possibility to people to change the basic adapter but NOT TESTED!
+     * @param adapter: adapter to be set
+     */
     // TODO: Try to see if it works
     public void setCustomAdapter(CustomAdapter adapter) {
         this.adapter = adapter;
@@ -175,6 +187,9 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
         return super.getText();
     }
 
+    /**
+     * Example of a possible implementation of the {@link CustomAdapter}
+     */
     private class ContactsAdapter extends CustomAdapter {
 
         ArrayList<People> toDisplayList = new ArrayList<>();
@@ -309,6 +324,10 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
         setText("");
     }
 
+    /**
+     * Used just to see what the getText should return.
+     * @return if someone is selected or not
+     */
     public boolean isSomeoneSelected() {
         return selected != null;
     }

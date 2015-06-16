@@ -12,8 +12,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.provider.ContactsContract;
 import android.text.SpannableStringBuilder;
-import android.util.Log;
-import android.widget.Adapter;
 import android.widget.BaseAdapter;
 import android.widget.Filterable;
 
@@ -26,7 +24,6 @@ import java.util.ArrayList;
 
 /**
  * It's the simplest class possible: it just needs a context and returns the data you need with the people class
- * The default behaviour is to get the phone but you can change it by calling the
  */
 public abstract class CustomAdapter extends BaseAdapter implements Filterable {
 
@@ -43,16 +40,21 @@ public abstract class CustomAdapter extends BaseAdapter implements Filterable {
         st.start();
     }
 
-    private static class CustomHandler extends Handler{
+
+    /**
+     * Handler used to update UI once data are loaded
+     */
+    private static class CustomHandler extends Handler {
         ArrayList<People> people;
         AsyncLoad load;
         CustomAdapter current;
 
-        private CustomHandler(ArrayList<People> people, AsyncLoad load, CustomAdapter current){
+        private CustomHandler(ArrayList<People> people, AsyncLoad load, CustomAdapter current) {
             this.load = load;
             this.people = people;
             this.current = current;
         }
+
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -66,14 +68,13 @@ public abstract class CustomAdapter extends BaseAdapter implements Filterable {
 
     }
 
+
     private static String transformInt(AutoCompleteContactTextView.TYPE_OF_DATA data) {
         switch (data) {
             case PHONE:
                 return ContactsContract.CommonDataKinds.Phone.NUMBER;
             case EMAIL:
                 return ContactsContract.CommonDataKinds.Email.DATA;
-            case PHYSICAL_ADDRESS:
-                // TODO: Implement that
             default:
                 return ContactsContract.CommonDataKinds.Phone.NUMBER;
         }
@@ -83,8 +84,6 @@ public abstract class CustomAdapter extends BaseAdapter implements Filterable {
         switch (data) {
             case PHONE:
                 return ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-            case PHYSICAL_ADDRESS:
-                // TODO: Implement that
             case EMAIL:
                 return ContactsContract.CommonDataKinds.Email.CONTENT_URI;
             default:
@@ -101,11 +100,12 @@ public abstract class CustomAdapter extends BaseAdapter implements Filterable {
         return BitmapFactory.decodeStream(input);
     }
 
-    public static interface AsyncLoad{
+
+    public static interface AsyncLoad {
         void hasLoaded(CustomAdapter adapter);
     }
 
-    private class SearchThread extends Thread{
+    private class SearchThread extends Thread {
         String whatToGet;
         Uri service;
         Handler mHandler;
@@ -122,14 +122,13 @@ public abstract class CustomAdapter extends BaseAdapter implements Filterable {
         public void run() {
             Looper.prepare();
             Cursor cursor = context.getContentResolver().query(service, null, null, null, null);
-            if (cursor != null)
-            {
+            if (cursor != null) {
                 while (cursor.moveToNext()) {
                     String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
                     String data = cursor.getString(cursor.getColumnIndex(whatToGet));
                     String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
                     People toBeAdded = new People(new SpannableStringBuilder(name), new SpannableStringBuilder(data), loadContactPhoto(context.getContentResolver(), Long.parseLong(id)));
-                    if (!list.contains(toBeAdded)){
+                    if (!list.contains(toBeAdded)) {
                         list.add(toBeAdded);
                     }
                 }
