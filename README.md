@@ -7,6 +7,8 @@ ContactAutoCompleteTextView is a view which allows the user to search across all
 
 The thread to get the data is asynchronous, which allow the view to load very fast (without this, you can need 1 to 2 seconds for 1500 contacts).
 
+[Javadoc] (http://lolobosse.github.io/ContactsAutoCompleteTextView/)
+
 ### Demo ###
 ![Alt text](http://img15.hostingpics.net/pics/884217ezgifcomgifmaker.gif)
 
