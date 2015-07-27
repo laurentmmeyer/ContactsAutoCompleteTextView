@@ -280,6 +280,16 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
                             } else if (toFilter.getData().toString().toLowerCase().startsWith(constraint.toString().toLowerCase())) {
                                 filtered.add(toFilter);
                             }
+                            // TODO: Make it country code insensible
+                            // One approach but with limitations:
+                            /*
+                                It does work when you type "0176", it looks for "176" which is contained in +49176....
+                             */
+                            else if (constraint.toString().startsWith("0") && !constraint.toString().startsWith("00")){
+                                if (toFilter.getData().toString().toLowerCase().contains(constraint.toString().toLowerCase().substring(1))){
+                                    filtered.add(toFilter);
+                                }
+                            }
                         }
                         r.values = filtered;
                         r.count = filtered.size();
