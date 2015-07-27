@@ -187,6 +187,20 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
         return super.getText();
     }
 
+    public String getName(){
+        if (isSomeoneSelected()){
+            return selected.getName().toString();
+        }
+        return null;
+    }
+
+    public String getData(){
+        if (isSomeoneSelected()){
+            return selected.getData().toString();
+        }
+        return null;
+    }
+
     /**
      * Example of a possible implementation of the {@link CustomAdapter}
      */
