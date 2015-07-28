@@ -42,7 +42,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
     /**
      * Choose which data you want to have
      */
-    public enum TYPE_OF_DATA {PHONE, EMAIL}
+    public enum TYPE_OF_DATA {PHONE, EMAIL, BOTH}
 
     public enum STYLE {NONE, BOLD, UNDERLINE}
 
@@ -131,6 +131,9 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
                         break;
                     case 2:
                         type = TYPE_OF_DATA.EMAIL;
+                        break;
+                    case 3:
+                        type = TYPE_OF_DATA.BOTH;
                         break;
                 }
             }
