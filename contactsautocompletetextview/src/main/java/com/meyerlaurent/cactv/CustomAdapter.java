@@ -33,10 +33,10 @@ public abstract class CustomAdapter extends BaseAdapter implements Filterable {
      */
     public ArrayList<People> dataList = new ArrayList<>();
 
-    CustomAdapter(Context context, String whatToGet, Uri service, AsyncLoad load) {
+    CustomAdapter(Context context, String whatToGet, Uri[] services, AsyncLoad load) {
         this.context = context;
         Handler mHandler = new CustomHandler(dataList, load, this);
-        SearchThread st = new SearchThread(whatToGet, service, mHandler);
+        SearchThread st = new SearchThread(whatToGet, services, mHandler);
         st.start();
     }
 
@@ -80,14 +80,19 @@ public abstract class CustomAdapter extends BaseAdapter implements Filterable {
         }
     }
 
-    private static Uri transformDataUri(AutoCompleteContactTextView.TYPE_OF_DATA data) {
+    private static Uri [] transformDataUri(AutoCompleteContactTextView.TYPE_OF_DATA data) {
         switch (data) {
             case PHONE:
-                return ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+                Uri[] phone = {ContactsContract.CommonDataKinds.Phone.CONTENT_URI};
+                return phone;
             case EMAIL:
-                return ContactsContract.CommonDataKinds.Email.CONTENT_URI;
+                Uri[] email = {ContactsContract.CommonDataKinds.Email.CONTENT_URI};
+                return email;
+            case BOTH:
+                Uri[] both = {ContactsContract.CommonDataKinds.Phone.CONTENT_URI, ContactsContract.CommonDataKinds.Email.CONTENT_URI};
             default:
-                return ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+                Uri[] defaultArray = {ContactsContract.CommonDataKinds.Phone.CONTENT_URI};
+                return defaultArray;
         }
     }
 
@@ -107,35 +112,37 @@ public abstract class CustomAdapter extends BaseAdapter implements Filterable {
 
     private class SearchThread extends Thread {
         String whatToGet;
-        Uri service;
+        Uri[] services;
         Handler mHandler;
 
         ArrayList<People> list = new ArrayList<>();
 
-        private SearchThread(String whatToGet, Uri service, Handler handler) {
+        private SearchThread(String whatToGet, Uri[] services, Handler handler) {
             this.whatToGet = whatToGet;
-            this.service = service;
+            this.services = services;
             mHandler = handler;
         }
 
         @Override
         public void run() {
             Looper.prepare();
-            Cursor cursor = context.getContentResolver().query(service, null, null, null, null);
-            if (cursor != null) {
-                while (cursor.moveToNext()) {
-                    String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                    String data = cursor.getString(cursor.getColumnIndex(whatToGet));
-                    String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                    People toBeAdded = new People(new SpannableStringBuilder(name), new SpannableStringBuilder(data), loadContactPhoto(context.getContentResolver(), Long.parseLong(id)));
-                    if (!list.contains(toBeAdded)) {
-                        list.add(toBeAdded);
+            for (Uri service : services) {
+                Cursor cursor = context.getContentResolver().query(service, null, null, null, null);
+                if (cursor != null) {
+                    while (cursor.moveToNext()) {
+                        String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                        String data = cursor.getString(cursor.getColumnIndex(whatToGet));
+                        String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                        People toBeAdded = new People(new SpannableStringBuilder(name), new SpannableStringBuilder(data), loadContactPhoto(context.getContentResolver(), Long.parseLong(id)));
+                        if (!list.contains(toBeAdded)) {
+                            list.add(toBeAdded);
+                        }
                     }
+                    cursor.close();
+                    Message m = new Message();
+                    m.obj = list;
+                    mHandler.handleMessage(m);
                 }
-                cursor.close();
-                Message m = new Message();
-                m.obj = list;
-                mHandler.handleMessage(m);
             }
         }
     }
