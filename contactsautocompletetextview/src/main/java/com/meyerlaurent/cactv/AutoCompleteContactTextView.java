@@ -2,6 +2,7 @@ package com.meyerlaurent.cactv;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.telephony.PhoneNumberUtils;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
@@ -42,12 +43,15 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
     /**
      * Choose which data you want to have
      */
-    public enum TYPE_OF_DATA {PHONE, EMAIL, BOTH}
+    public enum TYPE_OF_DATA {
+        PHONE, EMAIL, BOTH
+    }
 
     public enum STYLE {NONE, BOLD, UNDERLINE}
 
     /**
      * Call it if you want to create this view programmatically
+     *
      * @param s: Style you want to set refer to {@link com.meyerlaurent.cactv.AutoCompleteContactTextView.STYLE}
      */
     public void changeStyle(STYLE s) {
@@ -147,6 +151,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
 
     /**
      * Should give the possibility to people to change the basic adapter but NOT TESTED!
+     *
      * @param adapter: adapter to be set
      */
     // TODO: Try to see if it works
@@ -190,15 +195,15 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
         return super.getText();
     }
 
-    public String getName(){
-        if (isSomeoneSelected()){
+    public String getName() {
+        if (isSomeoneSelected()) {
             return selected.getName().toString();
         }
         return null;
     }
 
-    public String getData(){
-        if (isSomeoneSelected()){
+    public String getData() {
+        if (isSomeoneSelected()) {
             return selected.getData().toString();
         }
         return null;
@@ -280,16 +285,25 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
                                     toFilter.setName(text);
                                 }
                                 filtered.add(toFilter);
-                            } else if (toFilter.getData().toString().toLowerCase().startsWith(constraint.toString().toLowerCase())) {
-                                filtered.add(toFilter);
+                            }
+                            String data = toFilter.getData().toString();
+                            boolean isPhoneNumber = PhoneNumberUtils.isGlobalPhoneNumber(data);
+                            if (isPhoneNumber) {
+                                if (toFilter.getData().toString().toLowerCase().startsWith(constraint.toString().toLowerCase())) {
+                                    filtered.add(toFilter);
+                                }
+                            } else {
+                                if (toFilter.getData().toString().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                                    filtered.add(toFilter);
+                                }
                             }
                             // TODO: Make it country code insensible
                             // One approach but with limitations:
                             /*
                                 It does work when you type "0176", it looks for "176" which is contained in +49176....
                              */
-                            else if (constraint.toString().startsWith("0") && !constraint.toString().startsWith("00")){
-                                if (toFilter.getData().toString().toLowerCase().contains(constraint.toString().toLowerCase().substring(1))){
+                            if (constraint.toString().startsWith("0") && !constraint.toString().startsWith("00")) {
+                                if (toFilter.getData().toString().toLowerCase().contains(constraint.toString().toLowerCase().substring(1))) {
                                     filtered.add(toFilter);
                                 }
                             }
@@ -353,6 +367,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
 
     /**
      * Used just to see what the getText should return.
+     *
      * @return if someone is selected or not
      */
     public boolean isSomeoneSelected() {
