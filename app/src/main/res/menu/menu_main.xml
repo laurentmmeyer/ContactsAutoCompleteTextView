@@ -8,7 +8,7 @@
             android:title="Phone number"
             android:checked="true"/>
         <item android:id="@+id/menu_mail"
-            android:title="Email number" />
+            android:title="Email" />
         <item android:id="@+id/menu_both"
             android:title="Both"/>
         </group>
