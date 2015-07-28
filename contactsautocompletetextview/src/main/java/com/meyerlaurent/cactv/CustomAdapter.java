@@ -90,6 +90,7 @@ public abstract class CustomAdapter extends BaseAdapter implements Filterable {
                 return email;
             case BOTH:
                 Uri[] both = {ContactsContract.CommonDataKinds.Phone.CONTENT_URI, ContactsContract.CommonDataKinds.Email.CONTENT_URI};
+                return both;
             default:
                 Uri[] defaultArray = {ContactsContract.CommonDataKinds.Phone.CONTENT_URI};
                 return defaultArray;
@@ -139,11 +140,11 @@ public abstract class CustomAdapter extends BaseAdapter implements Filterable {
                         }
                     }
                     cursor.close();
-                    Message m = new Message();
-                    m.obj = list;
-                    mHandler.handleMessage(m);
                 }
             }
+            Message m = new Message();
+            m.obj = list;
+            mHandler.handleMessage(m);
         }
     }
 }
