@@ -9,6 +9,8 @@
             android:checked="true"/>
         <item android:id="@+id/menu_mail"
             android:title="Email number" />
+        <item android:id="@+id/menu_both"
+            android:title="Both"/>
         </group>
         <item android:id="@+id/bold"
             android:title="Bold effect"

@@ -38,6 +38,10 @@ public class MainActivity extends ActionBarActivity {
                 item.setChecked(true);
                 textView.setType(AutoCompleteContactTextView.TYPE_OF_DATA.EMAIL);
                 break;
+            case R.id.menu_both:
+                item.setChecked(true);
+                textView.setType(AutoCompleteContactTextView.TYPE_OF_DATA.BOTH);
+                break;
             case R.id.bold:
                 if (item.isChecked()){
                     item.setChecked(false);
