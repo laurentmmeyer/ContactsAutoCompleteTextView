@@ -2,6 +2,7 @@ package com.meyerlaurent.cactv;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.telephony.PhoneNumberUtils;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
@@ -292,6 +293,14 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
                                 if (toFilter.getData().toString().toLowerCase().contains(constraint.toString().toLowerCase().substring(1))){
                                     filtered.add(toFilter);
                                 }
+                            }
+
+                            // Test the Google method
+                            // Google method works for the whole number
+                            // --> You type +491234567890 and it returns that 01234567890 is ok
+                            else if (constraint.toString().startsWith("+")||constraint.toString().startsWith("00")) {
+                                if (PhoneNumberUtils.compare(constraint.toString(), toFilter.getData().toString()))
+                                    filtered.add(toFilter);
                             }
                         }
                         r.values = filtered;
