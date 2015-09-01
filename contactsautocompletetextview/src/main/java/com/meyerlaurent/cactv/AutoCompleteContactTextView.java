@@ -115,8 +115,8 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
         this.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                setText(((People) AutoCompleteContactTextView.this.getAdapter().getItem(position)).getName().toString());
                 selected = (People) getAdapter().getItem(position);
+                setText(selected.getName().toString());
             }
         });
         if (attrs != null) {
