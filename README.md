@@ -28,7 +28,7 @@ The thread to get the data is asynchronous, which allow the view to load very fa
 
 __Lib available for Gradle:__
 
-```compile 'com.github.lolobosse.contactsautocompletetextview:library:0.1'```
+```compile 'com.github.lolobosse.contactsautocompletetextview:library:0.1.1'```
 
 __And for Maven:__
 
@@ -36,7 +36,7 @@ __And for Maven:__
 <dependency>
   <groupId>com.github.lolobosse.contactsautocompletetextview</groupId>
   <artifactId>library</artifactId>
-  <version>0.1</version>
+  <version>0.1.1</version>
   <type>aar</type>
 </dependency>
 ```
@@ -66,6 +66,7 @@ Then create a view, for example like this:
 __DO NOT FORGET TO SET__:
 ```xmlns:auto="http://schemas.android.com/apk/res-auto"``` on your parent layout.
 
+
 Enjoy :smile:
 
 ### Attributes ###
@@ -83,6 +84,13 @@ Enjoy :smile:
     1. `phone` : Phone numbers
     2. `email` : Emails
 
+###ChangeMap###
++ 0.1.1
+    + Fixed issue [#3](https://github.com/lolobosse/ContactsAutoCompleteTextView/issues/3)
+    + Fixed issue [#4](https://github.com/lolobosse/ContactsAutoCompleteTextView/issues/4)
+
++ 0.1
+    + Initial release
 
 
 The software is under MIT License.
