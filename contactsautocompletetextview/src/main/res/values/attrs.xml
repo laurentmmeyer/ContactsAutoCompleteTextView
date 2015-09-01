@@ -16,5 +16,6 @@
             <enum name="email" value="2"/>
             <enum name="emailAndphone" value="3"/>
         </attr>
+        <attr name="splitOnCountryCode" format="boolean"/>
     </declare-styleable>
 </resources>

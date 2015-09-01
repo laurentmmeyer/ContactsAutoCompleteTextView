@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 /**
  * Created by laurentmeyer on 02/03/15.
@@ -39,16 +40,21 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
     String typedLetterStyle;
     AttributeSet attrs;
     int xmlIntType = 0;
+    boolean spiltOptionActivated;
+    boolean shouldSplit;
 
     /**
      * Choose which data you want to have
      */
-    public enum TYPE_OF_DATA {PHONE, EMAIL, BOTH}
+    public enum TYPE_OF_DATA {
+        PHONE, EMAIL, BOTH
+    }
 
     public enum STYLE {NONE, BOLD, UNDERLINE}
 
     /**
      * Call it if you want to create this view programmatically
+     *
      * @param s: Style you want to set refer to {@link com.meyerlaurent.cactv.AutoCompleteContactTextView.STYLE}
      */
     public void changeStyle(STYLE s) {
@@ -140,6 +146,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
             }
             returnPattern = TextUtils.isEmpty(array.getString(R.styleable.PhoneNumberAutoComplete_getTextPattern)) ? "[Nn]: [P]" : array.getString(R.styleable.PhoneNumberAutoComplete_getTextPattern);
             displayPhoto = array.getBoolean(R.styleable.PhoneNumberAutoComplete_displayPhotoIfAvailable, false);
+            spiltOptionActivated = array.getBoolean(R.styleable.PhoneNumberAutoComplete_splitOnCountryCode, false);
             array.recycle();
         }
         adapter = new ContactsAdapter(context, type);
@@ -148,6 +155,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
 
     /**
      * Should give the possibility to people to change the basic adapter but NOT TESTED!
+     *
      * @param adapter: adapter to be set
      */
     // TODO: Try to see if it works
@@ -191,15 +199,15 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
         return super.getText();
     }
 
-    public String getName(){
-        if (isSomeoneSelected()){
+    public String getName() {
+        if (isSomeoneSelected()) {
             return selected.getName().toString();
         }
         return null;
     }
 
-    public String getData(){
-        if (isSomeoneSelected()){
+    public String getData() {
+        if (isSomeoneSelected()) {
             return selected.getData().toString();
         }
         return null;
@@ -233,7 +241,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
 
         @Override
         public long getItemId(int position) {
-            return 0;
+            return position;
         }
 
         @Override
@@ -289,19 +297,20 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
                             /*
                                 It does work when you type "0176", it looks for "176" which is contained in +49176....
                              */
-                            else if (constraint.toString().startsWith("0") && !constraint.toString().startsWith("00")){
-                                if (toFilter.getData().toString().toLowerCase().contains(constraint.toString().toLowerCase().substring(1))){
+                            else if (constraint.toString().startsWith("0") && !constraint.toString().startsWith("00")) {
+                                if (toFilter.getData().toString().toLowerCase().contains(constraint.toString().toLowerCase().substring(1))) {
                                     filtered.add(toFilter);
                                 }
                             }
-
+                            Pattern p = Pattern.compile("[\\s\\(\\).-0-9]");
+                          //  else if ((constraint.toString().startsWith("00") || constraint.toString().startsWith("+")&&constraint.toString())
                             // Test the Google method
                             // Google method works for the whole number
                             // --> You type +491234567890 and it returns that 01234567890 is ok
-                            else if (constraint.toString().startsWith("+")||constraint.toString().startsWith("00")) {
-                                if (PhoneNumberUtils.compare(constraint.toString(), toFilter.getData().toString()))
-                                    filtered.add(toFilter);
-                            }
+//                            else if (constraint.toString().startsWith("+") || constraint.toString().startsWith("00")) {
+//                                if (PhoneNumberUtils.compare(constraint.toString(), toFilter.getData().toString()))
+//                                    filtered.add(toFilter);
+//                            }
                         }
                         r.values = filtered;
                         r.count = filtered.size();
@@ -362,6 +371,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
 
     /**
      * Used just to see what the getText should return.
+     *
      * @return if someone is selected or not
      */
     public boolean isSomeoneSelected() {
