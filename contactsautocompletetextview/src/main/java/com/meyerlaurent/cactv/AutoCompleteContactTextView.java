@@ -2,23 +2,14 @@ package com.meyerlaurent.cactv;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.telephony.PhoneNumberUtils;
 import android.text.Editable;
-import android.text.Html;
-import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
-import android.widget.Filter;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import java.util.ArrayList;
 
 /**
  * Created by laurentmeyer on 02/03/15.
@@ -27,7 +18,7 @@ import java.util.ArrayList;
 /**
  * Main class of the lib
  */
-public class AutoCompleteContactTextView extends AutoCompleteTextView implements CustomAdapter.AsyncLoad {
+public class AutoCompleteContactTextView extends AutoCompleteTextView implements AsyncLoad {
     Context context;
     int colorData;
     int colorName;
@@ -35,10 +26,16 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
     String returnPattern;
     People selected = null;
     boolean hasCustomAdapter = false;
-    CustomAdapter adapter;
+    CustomViewAdapter adapter;
     String typedLetterStyle;
     AttributeSet attrs;
     int xmlIntType = 0;
+
+    @Override
+    public void hasLoaded(CustomViewAdapter adapter) {
+        setAdapter(adapter);
+        Log.d("AutoCompleteContactText", "Has loaded");
+    }
 
     /**
      * Choose which data you want to have
@@ -68,6 +65,8 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
                 typedLetterStyle = "i";
                 break;
         }
+        ((CustomViewAdapter)getAdapter()).setStyleOfDifferentLetters(typedLetterStyle);
+        ((CustomViewAdapter)getAdapter()).setTypedLetterAreDifferent(typedLettersShouldBeDifferent);
     }
 
     // Default is phone
@@ -102,7 +101,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (AutoCompleteContactTextView.this.getAdapter() != null) {
-                    ((CustomAdapter) AutoCompleteContactTextView.this.getAdapter()).getFilter().filter(s);
+                    ((CustomViewAdapter) AutoCompleteContactTextView.this.getAdapter()).getFilter().filter(s);
                 }
                 selected = null;
             }
@@ -145,7 +144,7 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
             displayPhoto = array.getBoolean(R.styleable.PhoneNumberAutoComplete_displayPhotoIfAvailable, false);
             array.recycle();
         }
-        adapter = new ContactsAdapter(context, type);
+        adapter = new DemoAdapter(context, type, typedLetterStyle, typedLettersShouldBeDifferent, this , colorData, colorName, displayPhoto);
         this.setAdapter(adapter);
     }
 
@@ -155,14 +154,9 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
      * @param adapter: adapter to be set
      */
     // TODO: Try to see if it works
-    public void setCustomAdapter(CustomAdapter adapter) {
+    public void setCustomAdapter(CustomViewAdapter adapter) {
         this.adapter = adapter;
         hasCustomAdapter = true;
-        setAdapter(adapter);
-    }
-
-    @Override
-    public void hasLoaded(CustomAdapter adapter) {
         setAdapter(adapter);
     }
 
@@ -207,148 +201,6 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
             return selected.getData().toString();
         }
         return null;
-    }
-
-    /**
-     * Example of a possible implementation of the {@link CustomAdapter}
-     */
-    private class ContactsAdapter extends CustomAdapter {
-
-        ArrayList<People> toDisplayList = new ArrayList<>();
-        Filter filter;
-
-        private ContactsAdapter(Context context) {
-            super(context, type, AutoCompleteContactTextView.this);
-        }
-
-        public ContactsAdapter(Context context, TYPE_OF_DATA type) {
-            super(context, type, AutoCompleteContactTextView.this);
-        }
-
-        @Override
-        public int getCount() {
-            return toDisplayList == null ? 0 : toDisplayList.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return toDisplayList.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            LayoutInflater inflater = (LayoutInflater) context
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View v;
-            if (convertView == null) {
-                v = inflater.inflate(R.layout.layout_cell, null);
-            } else {
-                v = convertView;
-            }
-            TextView name = (TextView) v.findViewById(R.id.cell_name);
-            TextView data = (TextView) v.findViewById(R.id.cell_data);
-            name.setText(((People) getItem(position)).getName());
-            name.setTextColor(colorName);
-            data.setText(((People) getItem(position)).getData());
-            data.setTextColor(colorData);
-            if (displayPhoto) {
-                ImageView iv = (ImageView) v.findViewById(R.id.thumbnail_picture);
-                People p = (People) getItem(position);
-                if (p.getPicture() != null) {
-                    iv.setImageBitmap(p.getPicture());
-                    iv.setVisibility(View.VISIBLE);
-                }
-            }
-            return v;
-        }
-
-        @Override
-        public Filter getFilter() {
-            filter = new Filter() {
-                @Override
-                protected FilterResults performFiltering(CharSequence constraint) {
-                    FilterResults r = new FilterResults();
-                    if (constraint == null || constraint.length() == 0) {
-                        r.values = dataList;
-                        r.count = (dataList == null ? 0 : dataList.size());
-                    } else {
-                        ArrayList<People> filtered = new ArrayList<>();
-                        for (People toFilter : dataList) {
-                            if (toFilter.getName().toString().toLowerCase().contains(constraint.toString().toLowerCase())) {
-                                if (typedLettersShouldBeDifferent) {
-                                    Spanned text = setBold(constraint, toFilter);
-                                    toFilter.setName(text);
-                                }
-                                filtered.add(toFilter);
-                            }
-                            String data = toFilter.getData().toString();
-                            boolean isPhoneNumber = PhoneNumberUtils.isGlobalPhoneNumber(data);
-                            if (isPhoneNumber) {
-                                if (toFilter.getData().toString().toLowerCase().startsWith(constraint.toString().toLowerCase())) {
-                                    filtered.add(toFilter);
-                                }
-                            } else {
-                                if (toFilter.getData().toString().toLowerCase().contains(constraint.toString().toLowerCase())) {
-                                    filtered.add(toFilter);
-                                }
-                            }
-                            // TODO: Make it country code insensible
-                            // One approach but with limitations:
-                            /*
-                                It does work when you type "0176", it looks for "176" which is contained in +49176....
-                             */
-                            if (constraint.toString().startsWith("0") && !constraint.toString().startsWith("00")) {
-                                if (toFilter.getData().toString().toLowerCase().contains(constraint.toString().toLowerCase().substring(1))) {
-                                    filtered.add(toFilter);
-                                }
-                            }
-                        }
-                        r.values = filtered;
-                        r.count = filtered.size();
-                    }
-                    return r;
-                }
-
-
-                @Override
-                protected void publishResults(CharSequence constraint, FilterResults results) {
-                    toDisplayList = (ArrayList<People>) results.values;
-                    notifyDataSetChanged();
-                }
-            };
-            return filter;
-        }
-
-        /**
-         * It's maybe the most complicated function of this lib (yes, this lib has a trivial logic!)
-         * It's just a loop which add to all occurrences of a string a <[letter]></[letter]> to be
-         * displayed as bold or underlined by the #TextView (because rendered to HTML)
-         *
-         * @param constraint:                    The substring we want to highlight
-         * @param nameOfPeopleWeWantToHighlight: The people object on which these modifications will be done.
-         * @return a highlighted TextView compatible string
-         */
-        private Spanned setBold(CharSequence constraint, People nameOfPeopleWeWantToHighlight) {
-            String temp = nameOfPeopleWeWantToHighlight.getName().toString().replace("<" + typedLetterStyle + ">", "").replace("</" + typedLetterStyle + ">", "");
-            ArrayList<Integer> positions = new ArrayList<>();
-            for (int i = -1; (i = temp.toLowerCase().indexOf(constraint.toString().toLowerCase(), i + 1)) != -1; ) {
-                positions.add(i);
-            }
-            StringBuilder builder = new StringBuilder(temp);
-            int offsetIntroduced = 0;
-            for (Integer position : positions) {
-                builder.insert(position + (offsetIntroduced * 7), "<" + typedLetterStyle + ">");
-                builder.insert(position + ((offsetIntroduced * 7) + 3) + constraint.length(), "</" + typedLetterStyle + ">");
-                offsetIntroduced++;
-            }
-            return Html.fromHtml(builder.toString());
-        }
-
     }
 
     public TYPE_OF_DATA getType() {
