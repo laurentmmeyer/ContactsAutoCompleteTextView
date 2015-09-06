@@ -6,7 +6,6 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
@@ -34,7 +33,6 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
     @Override
     public void hasLoaded(CustomViewAdapter adapter) {
         setAdapter(adapter);
-        Log.d("AutoCompleteContactText", "Has loaded");
     }
 
     /**
@@ -156,7 +154,6 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
     // TODO: Try to see if it works
     public void setCustomAdapter(CustomViewAdapter adapter) {
         this.adapter = adapter;
-        hasCustomAdapter = true;
         setAdapter(adapter);
     }
 

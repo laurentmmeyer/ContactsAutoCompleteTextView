@@ -2,7 +2,6 @@ package com.meyerlaurent.cactv;
 
 import android.telephony.PhoneNumberUtils;
 import android.text.Spanned;
-import android.util.Log;
 import android.widget.Filter;
 
 import java.util.ArrayList;
@@ -18,9 +17,7 @@ public abstract class ContactsFilter extends Filter {
 
     public ContactsFilter(ArrayList<People> allPeople, boolean typedLettersShouldBeDifferent, String typedLetterStyle) {
         this.allPeople = allPeople;
-        Log.d("ContactsFilter", "passed allPeople:" + allPeople);
         this.typedLettersShouldBeDifferent = typedLettersShouldBeDifferent;
-        Log.d("ContactsFilter", "typedLettersShouldBeDifferent:" + typedLettersShouldBeDifferent);
         this.typedLetterStyle = typedLetterStyle;
 
     }
@@ -29,7 +26,6 @@ public abstract class ContactsFilter extends Filter {
     @Override
     protected FilterResults performFiltering(CharSequence constraint) {
         FilterResults r = new FilterResults();
-        Log.d("ContactsFilter", "copy allPeople.size():" + allPeople.size());
         if (constraint == null || constraint.length() == 0) {
             r.values = allPeople;
             r.count = (allPeople == null ? 0 : allPeople.size());
@@ -69,7 +65,6 @@ public abstract class ContactsFilter extends Filter {
             }
             r.values = filtered;
             r.count = filtered.size();
-            Log.d("ContactsFilter", "r.count:" + r.count);
         }
         return r;
     }

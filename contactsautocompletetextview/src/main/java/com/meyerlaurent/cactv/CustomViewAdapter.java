@@ -12,7 +12,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.provider.ContactsContract;
 import android.text.SpannableStringBuilder;
-import android.util.Log;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -42,7 +41,6 @@ public abstract class CustomViewAdapter extends BaseAdapter implements Filterabl
         Handler mHandler = new CustomHandler(allPeople, load, this);
         SearchThread st = new SearchThread(Utils.typeToColumn(data), Utils.typeToUri(data), mHandler);
         st.start();
-        Log.d("CustomViewAdapter", "displayed.size():" + displayed.size());
     }
 
     private static class CustomHandler extends Handler {
@@ -93,7 +91,6 @@ public abstract class CustomViewAdapter extends BaseAdapter implements Filterabl
                         }
                     }
                     cursor.close();
-                    Log.d("SearchThread", "list.size():" + list.size());
                 }
             }
             Message m = new Message();
@@ -115,16 +112,13 @@ public abstract class CustomViewAdapter extends BaseAdapter implements Filterabl
 
     @Override
     public Filter getFilter() {
-        Log.d("CustomViewAdapter", "get filter called");
         if (filter == null) {
-            Log.d("CustomViewAdapter", "filter is null");
             ArrayList<People> toBeAnalysed = new ArrayList<>();
             toBeAnalysed.addAll(allPeople);
             filter = new ContactsFilter(toBeAnalysed, typedLetterAreDifferent, styleOfDifferentLetters) {
                 @Override
                 protected void publishResults(CharSequence constraint, FilterResults results) {
                     displayed = (ArrayList<People>) results.values;
-                    Log.d("CustomViewAdapter", "after search disp.size():" + displayed.size());
                     notifyDataSetChanged();
                 }
             };

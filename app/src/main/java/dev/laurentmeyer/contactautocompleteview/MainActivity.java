@@ -6,6 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.meyerlaurent.cactv.AutoCompleteContactTextView;
+import com.meyerlaurent.cactv.DemoAdapter;
 
 
 public class MainActivity extends ActionBarActivity {
