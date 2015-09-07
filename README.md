@@ -1,5 +1,4 @@
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-ContactsAutoCompleteTextView-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/1826)
-[![GitHub license](https://img.shields.io/github/license/mashape/apistatus.svg)]()
 
 ## ContactAutoCompleteTextView ##
 
@@ -28,7 +27,7 @@ The thread to get the data is asynchronous, which allow the view to load very fa
 
 __Lib available for Gradle:__
 
-```compile 'com.github.lolobosse.contactsautocompletetextview:library:0.1.1'```
+```compile 'com.github.lolobosse.contactsautocompletetextview:library:0.1.2'```
 
 __And for Maven:__
 
@@ -36,7 +35,7 @@ __And for Maven:__
 <dependency>
   <groupId>com.github.lolobosse.contactsautocompletetextview</groupId>
   <artifactId>library</artifactId>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
   <type>aar</type>
 </dependency>
 ```
