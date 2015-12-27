@@ -289,7 +289,8 @@ public class AutoCompleteContactTextView extends AutoCompleteTextView implements
                             String data = toFilter.getData().toString();
                             boolean isPhoneNumber = PhoneNumberUtils.isGlobalPhoneNumber(data);
                             if (isPhoneNumber) {
-                                if (toFilter.getData().toString().toLowerCase().startsWith(constraint.toString().toLowerCase())) {
+                                String phone = toFilter.getData().toString().toLowerCase().replaceAll("\\D", "");
+                                if (phone.indexOf(constraint.toString().toLowerCase()) != -1) {
                                     filtered.add(toFilter);
                                 }
                             } else {
