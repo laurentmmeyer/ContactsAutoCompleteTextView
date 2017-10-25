@@ -91,6 +91,10 @@ Enjoy :smile:
 + 0.1
     + Initial release
 
+<a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/VLbo5pRZi9J7UQNYZkTCGwaR/lolobosse/ContactsAutoCompleteTextView'>
+  <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/VLbo5pRZi9J7UQNYZkTCGwaR/lolobosse/ContactsAutoCompleteTextView.svg' />
+</a>
+
 
 The software is under MIT License.
 
